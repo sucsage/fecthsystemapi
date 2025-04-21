@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guu khai khiang</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --main-red: #b23b3b;
+      --light-pink: #fff5f5;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-md">
+    <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold text-gray-800">Guu khai khiang</a>
+      <div class="flex items-center">
+        <a href="admin.html" class="mr-6 text-gray-600 hover:text-gray-800">Admin</a>
+        <a href="cart.html" class="relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Shopping Cart</h1>
+    
+    <div id="cart-container" class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <!-- Cart items will be inserted here dynamically -->
+    </div>
+
+    <div id="cart-summary" class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Order Summary</h2>
+      <div class="space-y-2 mb-4">
+        <div class="flex justify-between">
+          <span class="text-gray-600">Subtotal:</span>
+          <span id="subtotal" class="font-semibold">$0.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Shipping:</span>
+          <span id="shipping" class="font-semibold">$5.00</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600">Tax (7%):</span>
+          <span id="tax" class="font-semibold">$0.00</span>
+        </div>
+        <div class="border-t pt-2 flex justify-between">
+          <span class="text-lg font-bold">Total:</span>
+          <span id="total" class="text-lg font-bold">$0.00</span>
+        </div>
+      </div>
+      <button id="checkout-btn" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-lg w-full">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">Checkout</h2>
+        <button id="close-checkout-modal" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="checkout-form" class="space-y-4">
+        <div>
+          <label for="fullname" class="block text-gray-700">Full Name</label>
+          <input type="text" id="fullname" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border" required>
+        </div>
+        <div>
+          <label for="email" class="block text-gray-700">Email</label>
+          <input type="email" id="email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border" required>
+        </div>
+        <div>
+          <label for="address" class="block text-gray-700">Address</label>
+          <textarea id="address" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border" rows="3" required></textarea>
+        </div>
+        <div>
+          <label for="payment" class="block text-gray-700">Payment Method</label>
+          <select id="payment" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 border" required>
+            <option value="">Select payment method</option>
+            <option value="credit">Credit Card</option>
+            <option value="paypal">PayPal</option>
+            <option value="bank">Bank Transfer</option>
+          </select>
+        </div>
+        <div class="pt-4">
+          <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">Complete Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Confirmation Modal -->
+  <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-lg w-full">
+      <div class="text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Order Confirmed!</h2>
+        <p class="text-gray-600 mb-6">Thank you for your purchase. Your order has been received and is being processed.</p>
+        <div id="order-details" class="text-left bg-gray-50 p-4 rounded-lg mb-6">
+          <!-- Order details will be inserted here -->
+        </div>
+        <button id="back-to-shop" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">Return to Shop</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const cartContainer = document.getElementById('cart-container');
+    const cartCount = document.getElementById('cart-count');
+    const subtotalElement = document.getElementById('subtotal');
+    const taxElement = document.getElementById('tax');
+    const totalElement = document.getElementById('total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const checkoutModal = document.getElementById('checkout-modal');
+    const closeCheckoutModal = document.getElementById('close-checkout-modal');
+    const checkoutForm = document.getElementById('checkout-form');
+    const confirmationModal = document.getElementById('confirmation-modal');
+    const orderDetails = document.getElementById('order-details');
+    const backToShop = document.getElementById('back-to-shop');
+
+    // Initialize cart from localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    // Display cart items and update summary
+    function displayCart() {
+      if (cart.length === 0) {
+        cartContainer.innerHTML = `
+          <div class="text-center py-8">
+            <p class="text-gray-500 mb-4">Your cart is empty</p>
+            <a href="index.html" class="text-blue-500 hover:text-blue-700">Continue Shopping</a>
+          </div>
+        `;
+        disableCheckout();
+      } else {
+        let cartHTML = `
+          <table class="w-full">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left pb-4">Product</th>
+                <th class="text-center pb-4">Price</th>
+                <th class="text-center pb-4">Quantity</th>
+                <th class="text-right pb-4">Total</th>
+                <th class="pb-4"></th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        cart.forEach(item => {
+          cartHTML += `
+            <tr class="border-b">
+              <td class="py-4">
+                <div class="flex items-center">
+                  <img src="http://localhost:3000/images/${item.image}" alt="${item.image}" class="w-16 h-16 object-cover rounded mr-4">
+                  <div>
+                    <h3 class="font-semibold">${item.name}</h3>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">$${item.price.toFixed(2)}</td>
+              <td class="text-center">
+                <div class="flex items-center justify-center">
+                  <button class="quantity-btn bg-gray-200 px-2 rounded-l" data-id="${item.id}" data-action="decrease">-</button>
+                  <span class="px-4">${item.quantity}</span>
+                  <button class="quantity-btn bg-gray-200 px-2 rounded-r" data-id="${item.id}" data-action="increase">+</button>
+                </div>
+              </td>
+              <td class="text-right">$${(item.price * item.quantity).toFixed(2)}</td>
+              <td class="text-right">
+                <button class="remove-item text-red-500 hover:text-red-700" data-id="${item.id}">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+
+        cartHTML += `
+            </tbody>
+          </table>
+        `;
+
+        cartContainer.innerHTML = cartHTML;
+
+        // Add event listeners to quantity buttons
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+          button.addEventListener('click', () => {
+            const productId = parseInt(button.getAttribute('data-id'));
+            const action = button.getAttribute('data-action');
+            updateQuantity(productId, action);
+          });
+        });
+
+        // Add event listeners to remove buttons
+        document.querySelectorAll('.remove-item').forEach(button => {
+          button.addEventListener('click', () => {
+            const productId = parseInt(button.getAttribute('data-id'));
+            removeItem(productId);
+          });
+        });
+      }
+
+      updateCartCount();
+      updateOrderSummary();
+    }
+
+    // Update item quantity
+    function updateQuantity(productId, action) {
+      const itemIndex = cart.findIndex(item => item.id === productId);
+      if (itemIndex === -1) return;
+
+      if (action === 'increase') {
+        cart[itemIndex].quantity += 1;
+      } else if (action === 'decrease') {
+        if (cart[itemIndex].quantity > 1) {
+          cart[itemIndex].quantity -= 1;
+        } else {
+          removeItem(productId);
+          return;
+        }
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart));
+      displayCart();
+    }
+
+    // Remove item from cart
+    function removeItem(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      displayCart();
+    }
+
+    // Update cart count
+    function updateCartCount() {
+      const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+      cartCount.textContent = totalItems;
+    }
+
+    // Update order summary
+    function updateOrderSummary() {
+      const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+      const shipping = subtotal > 0 ? 5 : 0;
+      const tax = subtotal * 0.07;
+      const total = subtotal + shipping + tax;
+
+      subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+      taxElement.textContent = `$${tax.toFixed(2)}`;
+      totalElement.textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Disable checkout button if cart is empty
+    function disableCheckout() {
+      checkoutBtn.disabled = true;
+      checkoutBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+      checkoutBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
+    }
+
+    // Open checkout modal
+    checkoutBtn.addEventListener('click', () => {
+      if (cart.length > 0) {
+        checkoutModal.classList.remove('hidden');
+      }
+    });
+
+    // Close checkout modal
+    closeCheckoutModal.addEventListener('click', () => {
+      checkoutModal.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    checkoutModal.addEventListener('click', (e) => {
+      if (e.target === checkoutModal) {
+        checkoutModal.classList.add('hidden');
+      }
+    });
+
+    // Handle checkout form submission
+    checkoutForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const formData = {
+        fullname: document.getElementById('fullname').value,
+        email: document.getElementById('email').value,
+        address: document.getElementById('address').value,
+        payment: document.getElementById('payment').value
+      };
+
+      // Display order confirmation
+      const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+      const shipping = 5;
+      const tax = subtotal * 0.07;
+      const total = subtotal + shipping + tax;
+
+      const orderDate = new Date().toLocaleDateString();
+      const orderNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+
+      orderDetails.innerHTML = `
+        <p><strong>Order Number:</strong> #${orderNumber}</p>
+        <p><strong>Date:</strong> ${orderDate}</p>
+        <p><strong>Name:</strong> ${formData.fullname}</p>
+        <p><strong>Email:</strong> ${formData.email}</p>
+        <p><strong>Shipping Address:</strong> ${formData.address}</p>
+        <p><strong>Payment Method:</strong> ${getPaymentMethodName(formData.payment)}</p>
+        <p><strong>Total Amount:</strong> $${total.toFixed(2)}</p>
+      `;
+
+      checkoutModal.classList.add('hidden');
+      confirmationModal.classList.remove('hidden');
+
+      // Clear cart after successful order
+      cart = [];
+      localStorage.setItem('cart', JSON.stringify(cart));
+    });
+
+    // Helper function to get payment method name
+    function getPaymentMethodName(value) {
+      const methods = {
+        credit: 'Credit Card',
+        paypal: 'PayPal',
+        bank: 'Bank Transfer'
+      };
+      return methods[value] || value;
+    }
+
+    // Return to shop after order confirmation
+    backToShop.addEventListener('click', () => {
+      confirmationModal.classList.add('hidden');
+      window.location.href = 'index.html';
+    });
+
+    // Close confirmation modal when clicking outside
+    confirmationModal.addEventListener('click', (e) => {
+      if (e.target === confirmationModal) {
+        confirmationModal.classList.add('hidden');
+      }
+    });
+
+    // Initialize the page
+    displayCart();
+  </script>
+</body>
+</html>
